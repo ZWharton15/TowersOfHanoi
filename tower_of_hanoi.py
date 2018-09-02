@@ -3,11 +3,6 @@ from data_structures import Stack
 import sys
 import os
 
-stacks = []
-left_stack = Stack("Left")
-middle_stack = Stack("Middle")
-right_stack = Stack("Right")
-stacks = [left_stack, middle_stack, right_stack]
 
 def get_clear_command():
     #string used to clear console is different on windows to linux or mac
@@ -88,16 +83,50 @@ def draw_towers(towers):
     
     for i in range(len(tower1)):
         print(tower1[i] + "   " + tower2[i] + "   " + tower3[i])
+    #Add a label to the bottom of each tower
+    print("Left     Middle   Right")
         
+def print_title(player_moves, best_moves):
+    print("~~~Towers of Hanoi~~~")
+    print("Least Possible Moves: " + str(best_moves))
+    print("Your Moves: " + str(player_moves))
+    print("\n")
 
+def make_move(towers):
+    #Loop until a complete valid move is chosen
+    while True:
+        print("\nWhich stack do you want to move from?\n")
+        from_stack = get_input()
+        if from_stack.is_empty():
+            print("That tower is empty. Try again...")
+            draw_towers(towers)
+            continue
+        
+        print("\nWhich stack do you want to move to?\n")
+        to_stack = get_input()
+        
+        if to_stack.is_empty() or from_stack.peek() < to_stack.peek():
+            disk = from_stack.pop()
+            to_stack.push(disk)
+            break
+        else:
+            print("\n\nInvalid Move: Try again...")
+            draw_towers(towers)
+            
 def game_loop(num_disks):
     num_user_moves = 0
     clear_string = get_clear_command()
     
+    #Display the minimum number of moves to complete
+    num_optimal_moves = 2**num_disks - 1
+    print("Optimum amount of moves to complete: " + str(num_optimal_moves))
+    
     #Loop until the size of the end stack is the size of the number of nodes in the game
     while right_stack.get_size() != num_disks:
         os.system(clear_string)
-        print("...Current Towers...\n\n")
+        
+        #Display text at top of console
+        print_title(num_user_moves, num_optimal_moves)
         
         towers = []
         #Update each of the stacks and put them into a list of lists
@@ -108,52 +137,38 @@ def game_loop(num_disks):
         #Draw the updated stacks each loop
         draw_towers(towers)
         
-        #Loop until a complete valid move is chosen
-        while True:
-            print("\nWhich stack do you want to move from?\n")
-            from_stack = get_input()
-            if from_stack.is_empty():
-                print("That tower is empty. Try again...")
-                draw_towers(towers)
-                continue
-            
-            print("\nWhich stack do you want to move to?\n")
-            to_stack = get_input()
-            
-            if to_stack.is_empty() or from_stack.peek() < to_stack.peek():
-                disk = from_stack.pop()
-                to_stack.push(disk)
-                num_user_moves += 1
-                break
-            else:
-                print("\n\nInvalid Move: Try again...")
-                draw_towers(towers)
-    return num_user_moves
+        #Call method to validate move
+        make_move(towers)
+        num_user_moves += 1
+        
+    return num_user_moves, num_optimal_moves
 
 #Starting point of the game (Contains all the game logic)
 def start():
+    os.system(get_clear_command())
     num_disks = choose_disk_amount()
     
     #Push nodes to starting stack so that the biggest number is on the bottom of the stack
     for i in range(num_disks, 0, -1):
         left_stack.push(i)
     
-    #Display the minimum number of moves to complete
-    num_optimal_moves = 2**num_disks - 1
-    print("Optimum amount of moves to complete: " + str(num_optimal_moves))
-    
     #Call a method to run the game loop
-    final_moves = game_loop(num_disks)
+    final_moves, best_move = game_loop(num_disks)
     
     #Once the game loop is broken, the game is won
     print("\n\n\nYOU WIN!!!")
     print(f"YOU COMPLETED THE GAME IN {final_moves} MOVES!")
-    print(f"The best posisble is {num_optimal_moves}!")
+    print(f"The best posisble is {best_move}!")
 
 
 if __name__ == "__main__":
     #Run until the user quits
     while True:
+        stacks = []
+        left_stack = Stack("Left")
+        middle_stack = Stack("Middle")
+        right_stack = Stack("Right")
+        stacks = [left_stack, middle_stack, right_stack]
         #Setup the game
         start()
         
