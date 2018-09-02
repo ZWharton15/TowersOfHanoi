@@ -1,6 +1,7 @@
 #Import the stack class
 from data_structures import Stack
 import sys
+import os
 
 stacks = []
 left_stack = Stack("Left")
@@ -86,10 +87,15 @@ def draw_towers(towers):
 
 
 num_user_moves = 0
-
+#string used to clear console is different on windows to linux or mac
+if "win" in sys.platform:
+    clear_string = "cls"
+else:
+    clear_string = "clear"
+    
 #Loop until the size of the end stack is the size of the number of nodes in the game
 while right_stack.get_size() != num_disks:
-    print("\033[H\033[J")
+    os.system(clear_string)
     print("...Current Towers...\n\n")
     
     towers = []
